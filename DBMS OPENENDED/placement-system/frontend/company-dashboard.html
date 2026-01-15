@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Company Dashboard - Placement System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-layout">
+    <header class="branding-header">
+        <div class="brand-main">
+            <img src="assets/sit-logo.png" alt="SIT Logo" class="sit-logo">
+            <div class="dept-info">
+                <h4>DEPARTMENT OF ISE</h4>
+                <p>SIT TUMKURU</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <select class="lang-select" id="langSelect">
+                <option value="en">English</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="hi">हिन्दी</option>
+            </select>
+            <button class="theme-toggle" id="themeToggle">🌓 MODE</button>
+        </div>
+    </header>
+
+    <!-- Professional Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            SIT <span>PLACEMENT</span>
+        </div>
+        <nav class="nav-links">
+            <div class="nav-link active" onclick="switchTab('profile')" data-i18n="c_profile">
+                COMPANY PROFILE
+            </div>
+            <div class="nav-link" onclick="switchTab('applications')" data-i18n="c_talent">
+                TALENT ACQUISITION <span id="badgeCompanyApps" class="badge" style="margin-left:0.25rem; background:#e0f2fe; color:#0369a1; font-size:0.7rem;">0</span>
+            </div>
+
+            <div class="nav-link" onclick="switchTab('shortlisted')" data-i18n="c_pool">
+                EVALUATION POOL
+            </div>
+            <div class="nav-link" onclick="switchTab('interviews')" data-i18n="c_interviews">
+                INTERVIEW SCHEDULE <span id="badgeCompanyInterviews" class="badge" style="margin-left:0.25rem; background:#fef3c7; color:#92400e; font-size:0.7rem;">0</span>
+            </div>
+
+            <div class="nav-link" onclick="switchTab('offers')" data-i18n="c_offers">
+                OFFER ISSUANCE <span id="badgeCompanyOffers" class="badge" style="margin-left:0.25rem; background:#ecfdf5; color:#166534; font-size:0.7rem;">0</span>
+            </div>
+
+            <div class="nav-link" onclick="switchTab('hired')" data-i18n="c_hired">
+                ONBOARDED TALENT
+            </div>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <div class="nav-link" id="logoutBtn" style="color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2)"
+                    data-i18n="logout">
+                    SIGN OUT
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+        <header class="header">
+            <div style="flex: 1;">
+                <h2 id="pageTitle" data-i18n="c_ws_title">Recruitment Workspace</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="c_ws_desc">Enterprise interface for
+                    campus talent acquisition management</p>
+            </div>
+            <div class="user-profile">
+                <span id="userName"
+                    style="font-weight: 700; color: var(--primary); letter-spacing: -0.5px;">RECRUITER</span>
+            </div>
+        </header>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content show">
+            <div class="card"
+                style="padding: 2.5rem; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--border);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-weight: 800; letter-spacing: -0.5px;" data-i18n="ct_org_profile">Corporate
+                        Organization Profile</h3>
+                    <button class="btn-base btn-primary" onclick="showEditProfile()" id="editProfileBtn"
+                        style="max-width: 220px; min-width: 180px;" data-i18n="update_profile">UPDATE PROFILE</button>
+                </div>
+
+                <div id="profileView">
+                    <div class="stats-grid" style="margin-bottom: 3rem;">
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="organization">ORGANIZATION</div>
+                            <div id="pName" style="font-weight: 700; font-size: 1.1rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="industry">INDUSTRY</div>
+                            <div id="pIndustry" style="font-weight: 700; font-size: 1.1rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="offered_ctc">OFFERED CTC</div>
+                            <div id="pPackage" style="font-weight: 800; font-size: 1.5rem; color: var(--success);">₹ -
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="min_cgpa">MIN. CGPA</div>
+                            <div id="pCGPA" style="font-weight: 700; font-size: 1.1rem;">-</div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4">
+                        <small class="text-muted" data-i18n="job_desc">Job Description</small>
+                        <div id="pDesc" class="card mt-1" style="background: #f8fafc; font-size: 0.9rem;">-</div>
+                    </div>
+                </div>
+
+                <div id="editProfileView" style="display: none;">
+                    <form onsubmit="saveProfile(event)" class="mt-2">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Organization Name</label>
+                                <input type="text" id="editName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Industry Sector</label>
+                                <input type="text" id="editIndustry" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Designation / Role</label>
+                                <input type="text" id="editRole" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Annual Package (LPA)</label>
+                                <input type="number" id="editPackage" class="form-input" step="0.1" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Required CGPA</label>
+                                <input type="number" id="editCGPA" class="form-input" step="0.01" min="0" max="10"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label>Job Location</label>
+                                <input type="text" id="editLocation" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Open Positions</label>
+                                <input type="number" id="editPositions" class="form-input" min="1" required>
+                            </div>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Comprehensive Job Description</label>
+                            <textarea id="editDescription" class="form-input" rows="3" required></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Key Technical Skills Required</label>
+                            <textarea id="editSkills" class="form-input" rows="2" required></textarea>
+                        </div>
+                        <div class="form-actions mt-4">
+                            <button type="submit" class="btn-premium">Save Changes</button>
+                            <button type="button" class="btn-premium" style="background: #64748b;"
+                                onclick="cancelEdit()">Discard</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications Tab -->
+        <div id="applications" class="tab-content">
+            <div class="card">
+                <h3 data-i18n="ct_apps_title">Candidate Applications</h3>
+
+                <!-- Advanced Filters -->
+                <div class="mt-3" style="padding: 0.75rem 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); margin-bottom: 1rem;">
+                    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:flex-end;">
+                        <div style="min-width:140px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Min CGPA</label>
+                            <input type="number" step="0.01" min="0" max="10" id="filterMinCGPA" class="form-input" placeholder="e.g. 7.0">
+                        </div>
+                        <div style="min-width:140px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Max CGPA</label>
+                            <input type="number" step="0.01" min="0" max="10" id="filterMaxCGPA" class="form-input" placeholder="e.g. 10.0">
+                        </div>
+                        <div style="min-width:160px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Department</label>
+                            <select id="filterDept" class="form-input">
+                                <option value="">All</option>
+                                <option value="CSE">CSE</option>
+                                <option value="ISE">ISE</option>
+                                <option value="ECE">ECE</option>
+                                <option value="ME">ME</option>
+                                <option value="EEE">EEE</option>
+                                <option value="CV">CV</option>
+                            </select>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:0.4rem; margin-top:0.9rem;">
+                            <input type="checkbox" id="filterNoBacklogs">
+                            <label for="filterNoBacklogs" style="font-size:0.8rem; color:var(--text-muted);">Only candidates with 0 active backlogs</label>
+                        </div>
+                        <div style="flex:1; min-width:220px;">
+                            <label style="font-size:0.8rem; color:var(--text-muted);">Skills contains</label>
+                            <input type="text" id="filterSkills" class="form-input" placeholder="e.g. Java, React, SQL">
+                        </div>
+                        <div style="display:flex; gap:0.5rem;">
+                            <button type="button" class="btn-premium" onclick="loadApplications()">Apply Filters</button>
+                            <button type="button" class="btn-premium" style="background:#64748b;" onclick="resetApplicationFilters()">Clear</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-container mt-2">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th data-i18n="cand_name">CANDIDATE NAME</th>
+                                <th data-i18n="dept_label">DEPT</th>
+                                <th data-i18n="curr_cgpa">CGPA</th>
+                                <th data-i18n="status">STATUS</th>
+                                <th data-i18n="applied_on">APPLIED ON</th>
+                                <th data-i18n="decision">DECISION</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shortlisted Tab -->
+        <div id="shortlisted" class="tab-content">
+            <div class="card">
+                <h3 data-i18n="ct_shortlisted_title">Shortlisted Candidates</h3>
+                <div class="table-container mt-2">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Candidate</th>
+                                <th>Academic Performance</th>
+                                <th>Email Address</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="shortlistedTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interviews Tab -->
+        <div id="interviews" class="tab-content">
+            <div class="card" style="margin-bottom: 2rem;">
+                <h3>Schedule New Evaluation Round</h3>
+                <form onsubmit="scheduleInterview(event)" class="mt-2">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Application ID</label>
+                            <input type="number" id="intAppId" class="form-input" readonly style="background: #f1f5f9;">
+                        </div>
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" id="intDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Time</label>
+                            <input type="time" id="intTime" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Evaluation Type</label>
+                            <select id="intType" class="form-input" required>
+                                <option value="Technical">Technical Interview</option>
+                                <option value="HR">HR Interview</option>
+                                <option value="Group Discussion">Group Discussion</option>
+                                <option value="Aptitude">Aptitude Test</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Modality</label>
+                            <select id="intMode" class="form-input" required>
+                                <option value="Online">Online / Remote</option>
+                                <option value="Offline">On-Campus / Offline</option>
+                                <option value="Telephonic">Telephonic Round</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Round No.</label>
+                            <input type="number" id="intRound" class="form-input" value="1" min="1" required>
+                        </div>
+                    </div>
+                    <div class="form-grid mt-3">
+                        <div class="form-group">
+                            <label>Meeting Link / Venue</label>
+                            <input type="text" id="intLocation" class="form-input" placeholder="URL or Room No.">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-premium mt-4">Confirm Schedule</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h3>Ongoing Evaluation Rounds</h3>
+                <div class="table-container mt-2">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>CANDIDATE</th>
+                                <th>SCHEDULE</th>
+                                <th>ROUND</th>
+                                <th>TYPE</th>
+                                <th>STATUS</th>
+                                <th>MANAGEMENT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interviewsTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Make Offers Tab -->
+        <div id="offers" class="tab-content">
+            <div class="card">
+                <h3>Issue Placement Offer</h3>
+                <form onsubmit="sendOffer(event)" class="mt-2">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Student ID</label>
+                            <input type="number" id="offerStudId" class="form-input" required
+                                placeholder="Enter Stud_ID">
+                        </div>
+                        <div class="form-group">
+                            <label>Offered Salary (LPA)</label>
+                            <input type="number" id="offerSalary" class="form-input" step="0.1" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Expected Joining Date</label>
+                            <input type="date" id="offerJoinDate" class="form-input" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Service Bond (Months)</label>
+                            <input type="number" id="offerBond" class="form-input" value="0" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-premium mt-4">Dispatch Formal Offer</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Hired Tab -->
+        <div id="hired" class="tab-content">
+            <div class="card">
+                <h3>Recruited Talent Pool</h3>
+                <div class="table-container mt-2">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>CANDIDATE</th>
+                                <th>DEPARTMENT</th>
+                                <th>FINAL CTC</th>
+                                <th>JOINING DATE</th>
+                                <th>ONBOARDING</th>
+                            </tr>
+                        </thead>
+                        <tbody id="hiredTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script>
+        redirectIfNotAuthenticated();
+        updateNavbar();
+        loadCompanyDashboard();
+        loadCompanyNotificationBadges();
+
+        function updateNavbar() {
+            document.getElementById('userName').textContent = getUserName() || 'Company';
+            document.getElementById('logoutBtn').onclick = () => {
+                logout();
+                window.location.href = 'index.html';
+            };
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('show'));
+            document.getElementById(tabName).classList.add('show');
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+
+            const navLinks = document.querySelectorAll('.nav-link');
+            if (tabName === 'profile') navLinks[0].classList.add('active');
+            if (tabName === 'applications') navLinks[1].classList.add('active');
+            if (tabName === 'shortlisted') navLinks[2].classList.add('active');
+            if (tabName === 'interviews') navLinks[3].classList.add('active');
+            if (tabName === 'offers') navLinks[4].classList.add('active');
+            if (tabName === 'hired') navLinks[5].classList.add('active');
+
+            document.getElementById('pageTitle').textContent =
+                tabName === 'profile' ? getTranslatedText('ct_profile') :
+                    tabName === 'applications' ? getTranslatedText('ct_applications') :
+                        tabName === 'shortlisted' ? getTranslatedText('ct_shortlisted') :
+                            tabName === 'interviews' ? getTranslatedText('ct_interviews') :
+                                tabName === 'offers' ? getTranslatedText('ct_offers') : getTranslatedText('ct_hired');
+
+            if (tabName === 'applications') loadApplications();
+            if (tabName === 'shortlisted') loadShortlisted();
+            if (tabName === 'interviews') loadInterviews();
+            if (tabName === 'hired') loadHired();
+        }
+
+        async function loadCompanyDashboard() {
+            try {
+                const result = await apiCall('/company/profile');
+                if (result.success) {
+                    const c = result.data;
+                    const setSafeText = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = val;
+                    };
+                    setSafeText('pName', c.Comp_Name || '-');
+                    setSafeText('pIndustry', c.Industry || '-');
+                    setSafeText('pPackage', '₹ ' + (c.Package || '0') + ' LPA');
+                    setSafeText('pCGPA', c.Required_CGPA || '-');
+                    setSafeText('pDesc', c.Job_Description || 'No description provided.');
+
+                    if (document.getElementById('editName')) {
+                        document.getElementById('editName').value = c.Comp_Name || '';
+                        document.getElementById('editIndustry').value = c.Industry || '';
+                        document.getElementById('editRole').value = c.Role || '';
+                        document.getElementById('editPackage').value = c.Package || '';
+                        document.getElementById('editCGPA').value = c.Required_CGPA || '';
+                        document.getElementById('editLocation').value = c.Job_Location || '';
+                        document.getElementById('editPositions').value = c.Positions || '';
+                        document.getElementById('editDescription').value = c.Job_Description || '';
+                        document.getElementById('editSkills').value = c.Required_Skills || '';
+                    }
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function showEditProfile() {
+            document.getElementById('profileView').style.display = 'none';
+            document.getElementById('editProfileView').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'none';
+        }
+
+        function cancelEdit() {
+            document.getElementById('editProfileView').style.display = 'none';
+            document.getElementById('profileView').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'inline-block';
+        }
+
+        async function saveProfile(e) {
+            e.preventDefault();
+            try {
+                await apiCall('/company/profile', 'PUT', {
+                    Comp_Name: document.getElementById('editName').value,
+                    Industry: document.getElementById('editIndustry').value,
+                    Role: document.getElementById('editRole').value,
+                    Package: parseFloat(document.getElementById('editPackage').value),
+                    Required_CGPA: parseFloat(document.getElementById('editCGPA').value),
+                    Job_Location: document.getElementById('editLocation').value,
+                    Positions: parseInt(document.getElementById('editPositions').value),
+                    Job_Description: document.getElementById('editDescription').value,
+                    Required_Skills: document.getElementById('editSkills').value
+                });
+                showAlert('Corporate profile updated!', 'success');
+                loadCompanyDashboard();
+                cancelEdit();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadApplications() {
+            try {
+                const params = new URLSearchParams();
+
+                const minCGPA = document.getElementById('filterMinCGPA')?.value;
+                const maxCGPA = document.getElementById('filterMaxCGPA')?.value;
+                const dept = document.getElementById('filterDept')?.value;
+                const noBacklogs = document.getElementById('filterNoBacklogs')?.checked;
+                const skills = document.getElementById('filterSkills')?.value;
+
+                if (minCGPA) params.append('minCGPA', minCGPA);
+                if (maxCGPA) params.append('maxCGPA', maxCGPA);
+                if (dept) params.append('dept', dept);
+                if (noBacklogs) params.append('noBacklogs', 'true');
+                if (skills) params.append('skills', skills);
+
+                const query = params.toString() ? `?${params.toString()}` : '';
+                const result = await apiCall(`/company/applications${query}`);
+
+                if (result.success) {
+                    const rows = result.data.map(a => {
+                        const projects = (a.Projects || '').split('\n').filter(Boolean).slice(0, 2).join(' • ');
+                        const achievements = (a.Achievements || '').split('\n').filter(Boolean).slice(0, 2).join(' • ');
+
+                        const links = [
+                            a.Resume_Link ? `<a href="${a.Resume_Link}" target="_blank" style="color:var(--accent);">Resume</a>` : '',
+                            a.GitHub ? `<a href="${a.GitHub}" target="_blank" style="color:var(--accent);">GitHub</a>` : '',
+                            a.LinkedIn ? `<a href="${a.LinkedIn}" target="_blank" style="color:var(--accent);">LinkedIn</a>` : ''
+                        ].filter(Boolean).join(' | ');
+
+                        return `
+            <tr>
+              <td style="font-weight: 600;">
+                ${a.Stud_Name}
+                <div style="font-size:0.8rem; color:var(--text-muted);">${a.Dept} • CGPA: ${a.CGPA || '-'} • Sem: ${a.Semester || '-'}</div>
+                ${links ? `<div style="font-size:0.78rem; margin-top:0.25rem;">${links}</div>` : ''}
+              </td>
+              <td>${a.Dept}</td>
+              <td>${a.CGPA}</td>
+              <td><span class="badge badge-${getStatusColor(a.Status)}">${a.Status}</span></td>
+              <td>${new Date(a.Applied_At).toLocaleDateString()}</td>
+              <td>
+                <div style="font-size:0.78rem; margin-bottom:0.4rem; color:var(--text-muted); max-width:260px;">
+                  ${projects ? `<div><strong>Projects:</strong> ${projects}</div>` : ''}
+                  ${achievements ? `<div><strong>Achievements:</strong> ${achievements}</div>` : ''}
+                </div>
+                <div style="display: flex; gap: 0.5rem;">
+                  <button class="btn-premium btn-sm" onclick="updateAppStatus(${a.App_ID}, 'Shortlisted')" ${a.Status !== 'Applied' ? 'disabled' : ''}>Shortlist</button>
+                  <button class="btn-premium btn-sm" style="background: #ef4444;" onclick="updateAppStatus(${a.App_ID}, 'Rejected')" ${a.Status !== 'Applied' ? 'disabled' : ''}>Reject</button>
+                </div>
+              </td>
+            </tr>
+          `;
+                    }).join('');
+                    document.getElementById('applicationsTbody').innerHTML = rows || '<tr><td colspan="6" style="padding: 3rem; text-align: center;">No applications received yet.</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function updateAppStatus(appId, status) {
+            try {
+                await apiCall(`/company/application/${appId}/status`, 'PUT', { status });
+                showAlert(`Application ${status}!`, 'success');
+                loadApplications();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadShortlisted() {
+            try {
+                const result = await apiCall('/company/applications');
+                if (result.success) {
+                    const shortlisted = result.data.filter(a => a.Status === 'Shortlisted');
+                    const rows = shortlisted.map(a => {
+                        const acad = `CGPA: ${a.CGPA || '-'} | Sem: ${a.Semester || '-'} | Dept: ${a.Dept}`;
+                        const links = [
+                            a.Resume_Link ? `<a href="${a.Resume_Link}" target="_blank" style="color:var(--accent);">Resume</a>` : '',
+                            a.GitHub ? `<a href="${a.GitHub}" target="_blank" style="color:var(--accent);">GitHub</a>` : '',
+                            a.LinkedIn ? `<a href="${a.LinkedIn}" target="_blank" style="color:var(--accent);">LinkedIn</a>` : ''
+                        ].filter(Boolean).join(' | ');
+                        return `
+            <tr>
+              <td style="font-weight: 600;">
+                ${a.Stud_Name}
+                <div style="font-size:0.8rem; color:var(--text-muted);">${acad}</div>
+                ${links ? `<div style="font-size:0.78rem; margin-top:0.25rem;">${links}</div>` : ''}
+              </td>
+              <td>${a.CGPA}</td>
+              <td>${a.Email}</td>
+              <td><button class="btn-premium btn-sm" onclick="showScheduleInterview(${a.App_ID})">Schedule Round</button></td>
+            </tr>
+          `;
+                    }).join('');
+                    document.getElementById('shortlistedTbody').innerHTML = rows || '<tr><td colspan="4" style="padding: 3rem; text-align: center;">No candidates shortlisted yet.</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function showScheduleInterview(appId) {
+            document.getElementById('intAppId').value = appId;
+            switchTab('interviews');
+        }
+
+        async function scheduleInterview(e) {
+            e.preventDefault();
+            try {
+                await apiCall('/company/interview', 'POST', {
+                    appId: parseInt(document.getElementById('intAppId').value),
+                    intDate: document.getElementById('intDate').value,
+                    intTime: document.getElementById('intTime').value,
+                    roundNo: parseInt(document.getElementById('intRound').value),
+                    intMode: document.getElementById('intMode').value,
+                    intType: document.getElementById('intType').value,
+                    venue: document.getElementById('intLocation').value || null,
+                    meetingLink: document.getElementById('intLocation').value || null,
+                    remarks: ''
+                });
+                showAlert('Evaluation round scheduled!', 'success');
+                e.target.reset();
+                loadInterviews();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadInterviews() {
+            try {
+                const result = await apiCall('/company/interviews');
+                if (result.success) {
+                    const rows = result.data.map(i => `
+            <tr>
+              <td style="font-weight: 600;">${i.Stud_Name}</td>
+              <td>
+                <div>${new Date(i.Int_Date).toLocaleDateString()}</div>
+                <small class="text-muted">${i.Int_Time}</small>
+              </td>
+              <td>Round ${i.Round_No}</td>
+              <td>${i.Int_Type}</td>
+              <td><span class="badge badge-${i.Result === 'Pending' ? 'warning' : i.Result === 'Pass' ? 'success' : 'danger'}">${i.Result}</span></td>
+              <td>
+                ${i.Result === 'Pending' ? `
+                  <div style="display: flex; gap: 0.5rem;">
+                    <button class="btn-premium btn-sm" onclick="updateIntResult(${i.Int_ID}, 'Pass')">Pass</button>
+                    <button class="btn-premium btn-sm" style="background: #ef4444;" onclick="updateIntResult(${i.Int_ID}, 'Fail')">Fail</button>
+                  </div>
+                ` : '<small class="text-muted">Completed</small>'}
+              </td>
+            </tr>
+          `).join('');
+                    document.getElementById('interviewsTbody').innerHTML = rows || '<tr><td colspan="6" style="padding: 3rem; text-align: center;">No interviews on record.</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function updateIntResult(intId, result) {
+            try {
+                await apiCall(`/company/interview/${intId}/result`, 'PUT', { result, remarks: '' });
+                showAlert(`Interview marked as ${result}!`, 'success');
+                loadInterviews();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function sendOffer(e) {
+            e.preventDefault();
+            try {
+                await apiCall('/company/offer', 'POST', {
+                    studId: parseInt(document.getElementById('offerStudId').value),
+                    salary: parseFloat(document.getElementById('offerSalary').value),
+                    joinDate: document.getElementById('offerJoinDate').value,
+                    bondDuration: parseInt(document.getElementById('offerBond').value)
+                });
+                showAlert('Offer sent!', 'success');
+                e.target.reset();
+                loadHired();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadHired() {
+            try {
+                const result = await apiCall('/company/offers');
+                if (result.success) {
+                    const rows = result.data.map(o => `
+            <tr>
+              <td style="font-weight: 600;">${o.Stud_Name}</td>
+              <td>${o.Dept}</td>
+              <td style="color: var(--success); font-weight: 600;">₹ ${o.Salary} LPA</td>
+              <td>${new Date(o.Join_Date).toLocaleDateString()}</td>
+              <td><span class="badge badge-${o.Acceptance_Status === 'Accepted' ? 'success' : 'warning'}">${o.Acceptance_Status}</span></td>
+            </tr>
+          `).join('');
+                    document.getElementById('hiredTbody').innerHTML = rows || '<tr><td colspan="5" style="padding: 3rem; text-align: center;">No candidates hired yet.</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function getStatusColor(status) {
+            return status === 'Applied' ? 'warning' : status === 'Shortlisted' ? 'info' : status === 'Selected' ? 'success' : 'danger';
+        }
+    </script>
+</body>
+
+</html>

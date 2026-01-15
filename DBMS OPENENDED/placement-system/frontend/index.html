@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>College Placement Management System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="alert" class="alert"></div>
+
+    <header class="branding-header">
+        <div class="brand-main">
+            <img src="assets/sit-logo.png" alt="SIT Logo" class="sit-logo">
+            <div class="dept-info">
+                <h4>DEPARTMENT OF ISE</h4>
+                <p>SIT TUMKURU</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <select class="lang-select" id="langSelect">
+                <option value="en">English</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="hi">हिन्दी</option>
+            </select>
+            <button class="theme-toggle" id="themeToggle">🌓 MODE</button>
+        </div>
+    </header>
+
+    <div class="landing-wrapper">
+        <section class="hero-section">
+            <h1 data-i18n="title">College Placement Management System</h1>
+            <p data-i18n="hero">Unified Recruitment Platform for Students, Companies, and Administration</p>
+        </section>
+
+        <main class="portal-grid">
+            <div class="portal-card">
+                <div class="card-icon">ST</div>
+                <h3 data-i18n="studentPortal">Student Portal</h3>
+                <p data-i18n="st_portal_desc">Access your personalized career dashboard, manage academic history, and
+                    track real-time application status.</p>
+                <div class="btn-group">
+                    <button class="btn-base btn-primary" onclick="showLoginForm('student')"
+                        data-i18n="login_btn">LOGIN</button>
+                    <button class="btn-base btn-outline" onclick="showRegisterForm('student')"
+                        data-i18n="register_btn">REGISTER</button>
+                </div>
+            </div>
+
+            <div class="portal-card">
+                <div class="card-icon">CO</div>
+                <h3 data-i18n="companyPortal">Company Portal</h3>
+                <p data-i18n="c_portal_desc">Engage with top-tier talent, manage recruitment workflows, and streamline
+                    the shortlisting process.</p>
+                <div class="btn-group">
+                    <button class="btn-base btn-primary" onclick="showLoginForm('company')"
+                        data-i18n="login_btn">LOGIN</button>
+                    <button class="btn-base btn-outline" onclick="showRegisterForm('company')"
+                        data-i18n="partner_btn">PARTNER</button>
+                </div>
+            </div>
+
+            <div class="portal-card">
+                <div class="card-icon">AD</div>
+                <h3 data-i18n="adminPortal">Administration</h3>
+                <p data-i18n="ad_portal_desc">Centralized oversight for HODs and TPO coordinators to monitor placement
+                    velocity and analytics.</p>
+                <div class="btn-group">
+                    <button class="btn-base btn-primary" onclick="showLoginForm('coordinator')"
+                        data-i18n="staff_login_btn">STAFF LOGIN</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="loginTitle" data-i18n="login_btn">Login</h2>
+                <button class="modal-close" onclick="closeModal('loginModal')">&times;</button>
+            </div>
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label data-i18n="uni_email">UNIVERSITY EMAIL</label>
+                    <input type="email" id="loginEmail" class="form-input" placeholder="email@sit.ac.in" required>
+                </div>
+                <div class="form-group">
+                    <label data-i18n="password">PASSWORD</label>
+                    <input type="password" id="loginPassword" class="form-input" placeholder="••••••••" required>
+                </div>
+                <button type="submit" class="btn-base btn-primary" style="width: 100%;"
+                    data-i18n="authenticate">AUTHENTICATE</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="registerTitle" data-i18n="register_btn">Register</h2>
+                <button class="modal-close" onclick="closeModal('registerModal')">&times;</button>
+            </div>
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div id="studentRegisterFields"></div>
+                <div id="companyRegisterFields"></div>
+                <button type="submit" class="btn-base btn-primary" style="width: 100%;"
+                    data-i18n="create_account">CREATE ACCOUNT</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        let currentLoginRole = '';
+        let currentRegisterRole = '';
+
+        function showLoginForm(role) {
+            currentLoginRole = role;
+            document.getElementById('loginTitle').textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} Login`;
+
+            const emailLabel = document.querySelector('#loginModal label[data-i18n]');
+            if (role === 'company') {
+                emailLabel.setAttribute('data-i18n', 'corp_email');
+            } else {
+                emailLabel.setAttribute('data-i18n', 'uni_email');
+            }
+            updateUILanguage(localStorage.getItem('lang') || 'en');
+
+            document.getElementById('loginModal').classList.add('show');
+            document.getElementById('loginForm').reset();
+        }
+
+        function showRegisterForm(role) {
+            currentRegisterRole = role;
+            document.getElementById('registerTitle').textContent = `${role.charAt(0).toUpperCase() + role.slice(1)} Register`;
+
+            const studentFields = document.getElementById('studentRegisterFields');
+            const companyFields = document.getElementById('companyRegisterFields');
+
+            if (role === 'student') {
+                studentFields.innerHTML = `
+          <div class="form-group">
+            <label data-i18n="uni_email">UNIVERSITY EMAIL</label>
+            <input type="email" id="regEmail" class="form-input" placeholder="email@sit.ac.in" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="usn_label">USN (UNIVERSITY SERIAL NO.)</label>
+            <input type="text" id="regUSN" class="form-input" placeholder="e.g. 1SI20CS001" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="password">PASSWORD</label>
+            <input type="password" id="regPassword" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="full_name">FULL NAME</label>
+            <input type="text" id="regName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="dept_label">DEPARTMENT</label>
+            <select id="regDept" class="form-input" required>
+              <option value="" data-i18n="select_dept">Select Department</option>
+              <option value="CSE">Computer Science Engineering</option>
+              <option value="ISE">Information Science & Engineering</option>
+              <option value="AIML">Artificial Intelligence & Machine Learning</option>
+              <option value="DS">Data Science</option>
+              <option value="ECE">Electronics & Communication Engineering</option>
+              <option value="EEE">Electrical & Electronics Engineering</option>
+              <option value="EIE">Electronics & Instrumentation Engineering</option>
+              <option value="ME">Mechanical Engineering</option>
+              <option value="CE">Civil Engineering</option>
+              <option value="BT">Biotechnology Engineering</option>
+            </select>
+          </div>
+        `;
+                companyFields.innerHTML = '';
+            } else if (role === 'company') {
+                studentFields.innerHTML = '';
+                companyFields.innerHTML = `
+          <div class="form-group">
+            <label data-i18n="corp_email">CORPORATE EMAIL</label>
+            <input type="email" id="regEmail" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="password">PASSWORD</label>
+            <input type="password" id="regPassword" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="comp_name_label">COMPANY NAME</label>
+            <input type="text" id="regCompName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="job_role_label">JOB ROLE</label>
+            <input type="text" id="regRole" class="form-input" placeholder="e.g., Software Engineer" required>
+          </div>
+          <div class="form-group">
+            <label data-i18n="package_label">PACKAGE (LPA)</label>
+            <input type="number" id="regPackage" class="form-input" step="0.1" min="0" required>
+          </div>
+        `;
+            }
+
+            updateUILanguage(localStorage.getItem('lang') || 'en');
+            document.getElementById('registerModal').classList.add('show');
+            document.getElementById('registerForm').reset();
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const data = await login(email, password);
+
+                if (data.role === 'student') {
+                    window.location.href = 'student-dashboard.html';
+                } else if (data.role === 'company') {
+                    window.location.href = 'company-dashboard.html';
+                } else if (['Admin', 'Coordinator', 'HOD', 'TPO', 'coordinator'].includes(data.role)) {
+                    window.location.href = 'coordinator-dashboard.html';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                if (currentRegisterRole === 'student') {
+                    const name = document.getElementById('regName').value;
+                    const dept = document.getElementById('regDept').value;
+                    const usn = document.getElementById('regUSN').value;
+
+                    // USN vs Department validation (same rule as backend)
+                    const usnTrimmed = usn.trim().toUpperCase();
+                    const deptCodeMap = {
+                        'CSE': 'CS',
+                        'ISE': 'IS',
+                        'AIML': 'AI',
+                        'DS': 'DS',
+                        'ECE': 'EC',
+                        'EEE': 'EE',
+                        'EIE': 'EI',
+                        'ME': 'ME',
+                        'CE': 'CE',
+                        'BT': 'BT'
+                    };
+                    const expectedCode = deptCodeMap[dept];
+
+                    if (!expectedCode || usnTrimmed.length < 7) {
+                        showAlert('Invalid USN format for selected department.', 'error');
+                        return;
+                    }
+
+                    const usnDeptCode = usnTrimmed.substring(5, 7);
+                    if (usnDeptCode !== expectedCode) {
+                        showAlert('USN department code does not match selected department.', 'error');
+                        return;
+                    }
+
+                    await registerStudent(email, password, name, dept, usn);
+                    showAlert('Student registration successful! Please login.', 'success');
+                } else if (currentRegisterRole === 'company') {
+                    const compName = document.getElementById('regCompName').value;
+                    const role = document.getElementById('regRole').value;
+                    const packageLPA = document.getElementById('regPackage').value;
+                    await registerCompany(email, password, compName, role, packageLPA);
+                    showAlert('Company registration successful! Please login.', 'success');
+                }
+
+                closeModal('registerModal');
+                setTimeout(() => {
+                    showLoginForm(currentRegisterRole);
+                }, 1500);
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function (event) {
+            const loginModal = document.getElementById('loginModal');
+            const registerModal = document.getElementById('registerModal');
+
+            if (event.target === loginModal) {
+                loginModal.classList.remove('show');
+            }
+            if (event.target === registerModal) {
+                registerModal.classList.remove('show');
+            }
+        }
+
+        // Redirect if already authenticated
+        redirectIfAuthenticated();
+    </script>
+
+</body>
+
+</html>

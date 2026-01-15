@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Placement System</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="dashboard-layout">
+    <header class="branding-header">
+        <div class="brand-main">
+            <img src="assets/sit-logo.png" alt="SIT Logo" class="sit-logo">
+            <div class="dept-info">
+                <h4>DEPARTMENT OF ISE</h4>
+                <p>SIT TUMKURU</p>
+            </div>
+        </div>
+        <div class="header-controls">
+            <select class="lang-select" id="langSelect">
+                <option value="en">English</option>
+                <option value="kn">ಕನ್ನಡ</option>
+                <option value="hi">हिन्दी</option>
+            </select>
+            <button class="theme-toggle" id="themeToggle">🌓 MODE</button>
+        </div>
+    </header>
+
+    <!-- Professional Sidebar -->
+    <aside class="sidebar">
+        <div class="brand">
+            SIT <span>PLACEMENT</span>
+        </div>
+        <nav class="nav-links">
+            <div class="nav-link active" onclick="switchTab('profile')" data-i18n="s_profile">
+                MY PROFILE
+            </div>
+            <div class="nav-link" onclick="switchTab('portfolio')">
+                PORTFOLIO
+            </div>
+            <div class="nav-link" onclick="switchTab('companies')" data-i18n="s_drives">
+                RECRUITMENT DRIVES
+            </div>
+            <div class="nav-link" onclick="switchTab('applications')" data-i18n="s_apps">
+                APPLICATIONS <span id="badgeStudentApps" class="badge" style="margin-left:0.25rem; background:#e0f2fe; color:#0369a1; font-size:0.7rem;">0</span>
+            </div>
+            <div class="nav-link" onclick="switchTab('interviews')" data-i18n="s_interviews">
+                INTERVIEWS <span id="badgeStudentInterviews" class="badge" style="margin-left:0.25rem; background:#fef3c7; color:#92400e; font-size:0.7rem;">0</span>
+            </div>
+            <div class="nav-link" onclick="switchTab('offers')" data-i18n="s_offers">
+                JOB OFFERS <span id="badgeStudentOffers" class="badge" style="margin-left:0.25rem; background:#ecfdf5; color:#166534; font-size:0.7rem;">0</span>
+            </div>
+            <div style="margin-top: auto; padding-top: 2rem;">
+                <div class="nav-link" id="logoutBtn" style="color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.2)"
+                    data-i18n="logout">
+                    SIGN OUT
+                </div>
+            </div>
+        </nav>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="main-content">
+        <header class="header">
+            <div style="flex: 1;">
+                <h2 id="pageTitle" data-i18n="s_ws_title">Candidate Workspace</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem;" data-i18n="s_ws_desc">Manage your academic
+                    profile and professional recruitment cycle</p>
+            </div>
+            <div class="user-profile">
+                <span id="userName"
+                    style="font-weight: 700; color: var(--primary); letter-spacing: -0.5px;">LOADING...</span>
+            </div>
+        </header>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Profile Tab -->
+        <div id="profile" class="tab-content show">
+            <div class="card"
+                style="padding: 2.5rem; border-radius: var(--radius-lg); background: var(--bg-card); border: 1px solid var(--border);">
+                <div style="margin-bottom: 1.5rem; display:flex; align-items:center; gap:1rem; flex-wrap:wrap;">
+                    <div style="flex:1; max-width:360px;">
+                        <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:0.25rem;">Profile completeness</div>
+                        <div style="width:100%; background:#e5e7eb; border-radius:999px; overflow:hidden; height:0.6rem;">
+                            <div id="profileProgressBar" style="height:100%; width:0%; background:linear-gradient(90deg,#22c55e,#16a34a);"></div>
+                        </div>
+                    </div>
+                    <div id="profileProgressLabel" style="font-size:0.85rem; font-weight:600; color:var(--primary);">0% complete</div>
+                </div>
+
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <h3 style="font-weight: 800; letter-spacing: -0.5px;" data-i18n="st_acad_verif">Academic
+                        Verification Profile</h3>
+                    <button class="btn-base btn-primary" onclick="showEditProfile()" id="editProfileBtn"
+                        style="max-width: 220px; min-width: 180px;" data-i18n="update_records">UPDATE RECORDS</button>
+                </div>
+
+                <div id="profileView">
+                    <div class="stats-grid" style="margin-bottom: 3rem;">
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="full_name">FULL NAME</div>
+                            <div id="pName" class="stat-value" style="font-size: 1.25rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="usn_label">UNIVERSITY SERIAL NO.</div>
+                            <div id="pUSN" class="stat-value" style="font-size: 1.25rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="dept_label">DEPARTMENT</div>
+                            <div id="pDept" class="stat-value" style="font-size: 1.25rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="curr_cgpa">CURRENT CGPA</div>
+                            <div id="pCGPA" class="stat-value">-</div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 3rem; margin-bottom: 1.5rem; font-weight: 800; color: var(--primary);"
+                        data-i18n="acad_hist">Academic History</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="marks_10th">10TH SCORE (%)</div>
+                            <div id="p10th" class="stat-value" style="font-size: 1.5rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="marks_12th">12TH SCORE (%)</div>
+                            <div id="p12th" class="stat-value" style="font-size: 1.5rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="diploma_marks">DIPLOMA (%)</div>
+                            <div id="pDiploma" class="stat-value" style="font-size: 1.5rem;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="backlogs">ACTIVE BACKLOGS</div>
+                            <div id="pBacklogs" class="stat-value" style="font-size: 1.5rem; color: var(--danger);">-
+                            </div>
+                        </div>
+                    </div>
+
+                    <h4 style="margin-top: 3rem; margin-bottom: 1.5rem; font-weight: 800; color: var(--primary);"
+                        data-i18n="prof_port">
+                        Professional Portfolio</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="linkedin">LINKEDIN</div>
+                            <div id="pLinkedIn" class="stat-value"
+                                style="font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="github">GITHUB</div>
+                            <div id="pGitHub" class="stat-value"
+                                style="font-size: 0.9rem; overflow: hidden; text-overflow: ellipsis;">-</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label" data-i18n="resume">RESUME DOCUMENT</div>
+                            <div id="pResume" class="stat-value" style="font-size: 1.1rem;">-</div>
+                        </div>
+                        <div class="stat-card" style="grid-column: span 2;">
+                            <div class="stat-label">PROJECT HIGHLIGHTS</div>
+                            <div id="pProjects" class="stat-value" style="font-size: 0.95rem; white-space: pre-line;">-</div>
+                        </div>
+                        <div class="stat-card" style="grid-column: span 2;">
+                            <div class="stat-label">ACHIEVEMENTS / CERTIFICATIONS</div>
+                            <div id="pAchievements" class="stat-value" style="font-size: 0.95rem; white-space: pre-line;">-</div>
+                            <div id="pCertificates" style="margin-top:0.5rem; font-size:0.85rem;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="editProfileView" style="display: none;">
+                    <form onsubmit="saveProfile(event)" class="mt-2">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>USN (Locked)</label>
+                                <input type="text" id="editUSN" class="form-input" readonly
+                                    style="background: #f1f5f9;">
+                            </div>
+                            <div class="form-group">
+                                <label>Current CGPA</label>
+                                <input type="number" id="editCGPA" class="form-input" step="0.01" min="0" max="10"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label>Current Semester</label>
+                                <input type="number" id="editSem" class="form-input" min="1" max="8" required>
+                            </div>
+                            <div class="form-group">
+                                <label>10th Marks (%)</label>
+                                <input type="number" id="edit10th" class="form-input" step="0.01" min="0" max="100"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label>12th Marks (%)</label>
+                                <input type="number" id="edit12th" class="form-input" step="0.01" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Diploma Marks (%)</label>
+                                <input type="number" id="editDiploma" class="form-input" step="0.01" min="0" max="100">
+                            </div>
+                            <div class="form-group">
+                                <label>Current Backlogs</label>
+                                <input type="number" id="editBacklogs" class="form-input" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>History of Backlogs</label>
+                                <input type="number" id="editHistoryBacklogs" class="form-input" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="editPhone" class="form-input" required>
+                            </div>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Residential Address</label>
+                            <textarea id="editAddress" class="form-input" rows="2" required></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Technical Skills (comma separated)</label>
+                            <textarea id="editSkills" class="form-input" rows="2" required
+                                placeholder="e.g. Java, Python, React, SQL"></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Key Projects (short summary)</label>
+                            <textarea id="editProjects" class="form-input" rows="3" placeholder="e.g. Online placement portal using MERN stack; ML-based resume screener; ..."></textarea>
+                        </div>
+                        <div class="form-group mt-3">
+                            <label>Achievements & Certifications</label>
+                            <textarea id="editAchievements" class="form-input" rows="3" placeholder="e.g. Smart India Hackathon finalist; AWS Cloud Practitioner; Coursera ML course; ..."></textarea>
+                        </div>
+
+                        <div class="form-grid mt-3">
+                            <div class="form-group">
+                                <label>LinkedIn Profile URL</label>
+                                <input type="url" id="editLinkedIn" class="form-input"
+                                    placeholder="https://linkedin.com/in/...">
+                            </div>
+                            <div class="form-group">
+                                <label>GitHub Profile URL</label>
+                                <input type="url" id="editGitHub" class="form-input"
+                                    placeholder="https://github.com/...">
+                            </div>
+                            <div class="form-group">
+                                <label>Upload Resume (PDF)</label>
+                                <input type="file" id="editResumeFile" class="form-input" accept="application/pdf">
+                                <small class="text-muted">Upload updated resume in PDF format.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Upload Certificate (PDF / JPG / PNG)</label>
+                                <input type="file" id="editCertificateFile" class="form-input" accept="application/pdf,image/jpeg,image/png">
+                                <small class="text-muted">Upload key certificates like hackathons, MOOCs, etc.</small>
+                            </div>
+                        </div>
+                        <div class="form-actions mt-4" style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+                            <button type="submit" class="btn-premium">Save Academic Profile</button>
+                            <button type="button" class="btn-premium" style="background: #64748b;"
+                                onclick="cancelEdit()">Discard Changes</button>
+                            <button type="button" class="btn-premium" style="background:#0f766e;" onclick="uploadResume()">Upload Resume PDF</button>
+                            <button type="button" class="btn-premium" style="background:#0369a1;" onclick="uploadCertificate()">Upload Certificate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Portfolio Tab -->
+        <div id="portfolio" class="tab-content">
+            <div class="card">
+                <h3 style="font-weight:800; letter-spacing:-0.5px; margin-bottom:1.5rem;">Professional Portfolio</h3>
+
+                <div class="stats-grid" style="margin-bottom:2rem;">
+                    <div class="stat-card">
+                        <div class="stat-label">LINKEDIN</div>
+                        <div id="portLinkedIn" class="stat-value" style="font-size:0.9rem; overflow:hidden; text-overflow:ellipsis;">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">GITHUB</div>
+                        <div id="portGitHub" class="stat-value" style="font-size:0.9rem; overflow:hidden; text-overflow:ellipsis;">-</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">RESUME</div>
+                        <div id="portResume" class="stat-value" style="font-size:0.95rem;">-</div>
+                    </div>
+                </div>
+
+                <h4 style="margin-bottom:1rem; font-weight:800; color:var(--primary);">Project Highlights</h4>
+                <div id="portfolioProjects" class="companies-grid" style="margin-bottom:2rem;"></div>
+
+                <h4 style="margin-bottom:1rem; font-weight:800; color:var(--primary);">Achievements & Certifications</h4>
+                <div id="portfolioAchievements" style="margin-bottom:1rem;"></div>
+                <div id="portfolioCertificates" style="font-size:0.85rem;"></div>
+            </div>
+        </div>
+
+        <!-- Companies Tab -->
+        <div id="companies" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem; flex-wrap: wrap;">
+                    <h3>Recruitment Opportunities</h3>
+                    <div style="display: flex; gap: 0.75rem; align-items: center;">
+                        <input type="text" class="form-input" id="companySearch"
+                            placeholder="Search organization or role..." onkeyup="filterCompanies()" style="width: 260px;">
+                        <button class="btn-premium" type="button" onclick="loadEligibleCompanies()">Show Eligible Only</button>
+                        <button class="btn-premium" type="button" style="background:#64748b;" onclick="loadCompanies()">Show All</button>
+                    </div>
+                </div>
+                <div id="companiesList" class="companies-grid"></div>
+            </div>
+        </div>
+
+        <!-- Applications Tab -->
+        <div id="applications" class="tab-content">
+            <div class="card">
+                <h3>My Job Applications</h3>
+                <div class="table-container mt-2">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ORGANIZATION</th>
+                                <th>DESIGNATION</th>
+                                <th>BASE PACKAGE</th>
+                                <th>LOCATION</th>
+                                <th>STATUS</th>
+                                <th>APPLIED ON</th>
+                            </tr>
+                        </thead>
+                        <tbody id="applicationsTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interviews Tab -->
+        <div id="interviews" class="tab-content">
+            <div class="card">
+                <h3>Interview Schedule</h3>
+                <div class="table-container mt-2">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ORGANIZATION</th>
+                                <th>DATE & TIME</th>
+                                <th>ROUND</th>
+                                <th>MODALITY</th>
+                                <th>CATEGORY</th>
+                                <th>ACTION / VENUE</th>
+                                <th>RESULT</th>
+                            </tr>
+                        </thead>
+                        <tbody id="interviewsTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Offers Tab -->
+        <div id="offers" class="tab-content">
+            <div class="card">
+                <h3 data-i18n="st_offers_title">Job Offers & Appointments</h3>
+                <div id="offersList" class="offers-grid"></div>
+            </div>
+        </div>
+    </main>
+
+    <script src="js/auth.js"></script>
+    <script>
+        redirectIfNotAuthenticated();
+        updateNavbar();
+        loadStudentDashboard();
+        loadStudentNotificationBadges();
+
+        function updateNavbar() {
+            document.getElementById('userName').textContent = getUserName() || 'Student';
+            document.getElementById('logoutBtn').onclick = () => {
+                logout();
+                window.location.href = 'index.html';
+            };
+        }
+
+        async function loadStudentNotificationBadges() {
+            try {
+                const result = await apiCall('/student/notifications/summary');
+                if (result.success && result.data) {
+                    const { applications, interviews, offers } = result.data;
+                    const bApps = document.getElementById('badgeStudentApps');
+                    const bInts = document.getElementById('badgeStudentInterviews');
+                    const bOffers = document.getElementById('badgeStudentOffers');
+
+                    if (bApps) bApps.textContent = applications || 0;
+                    if (bInts) bInts.textContent = interviews || 0;
+                    if (bOffers) bOffers.textContent = offers || 0;
+                }
+            } catch (error) {
+                // non-critical, ignore errors
+                console.error('Student notifications load error:', error.message || error);
+            }
+        }
+
+        async function uploadCertificate() {
+            const fileInput = document.getElementById('editCertificateFile');
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                showAlert('Please choose a certificate file to upload.', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const allowed = ['application/pdf', 'image/jpeg', 'image/png'];
+            if (!allowed.includes(file.type)) {
+                showAlert('Only PDF/JPG/PNG certificates are allowed.', 'error');
+                return;
+            }
+
+            try {
+                const token = getToken();
+                const formData = new FormData();
+                formData.append('certificate', file);
+
+                const response = await fetch('http://localhost:5001/api/student/profile/certificate', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to upload certificate');
+                }
+
+                showAlert('Certificate uploaded successfully!', 'success');
+                loadStudentDashboard();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('show'));
+            document.getElementById(tabName).classList.add('show');
+            document.querySelectorAll('.nav-link').forEach(btn => btn.classList.remove('active'));
+
+            // Find the nav-link that corresponds to this tabName and add active
+            const navLinks = document.querySelectorAll('.nav-link');
+            if (tabName === 'profile') navLinks[0].classList.add('active');
+            if (tabName === 'portfolio') navLinks[1].classList.add('active');
+            if (tabName === 'companies') navLinks[2].classList.add('active');
+            if (tabName === 'applications') navLinks[3].classList.add('active');
+            if (tabName === 'interviews') navLinks[4].classList.add('active');
+            if (tabName === 'offers') navLinks[5].classList.add('active');
+
+            document.getElementById('pageTitle').textContent =
+                tabName === 'profile' ? getTranslatedText('st_profile') :
+                    tabName === 'portfolio' ? 'Portfolio' :
+                        tabName === 'companies' ? getTranslatedText('st_companies') :
+                            tabName === 'applications' ? getTranslatedText('st_applications') :
+                                tabName === 'interviews' ? getTranslatedText('st_interviews') : getTranslatedText('st_offers');
+
+            if (tabName === 'companies') loadCompanies();
+            if (tabName === 'applications') loadApplications();
+            if (tabName === 'interviews') loadInterviews();
+            if (tabName === 'offers') loadOffers();
+        }
+
+        async function loadStudentDashboard() {
+            try {
+                const result = await apiCall('/student/profile');
+                console.log('Profile Data Loaded:', result.data);
+
+                if (result.success) {
+                    const s = result.data;
+
+                    // cache for portfolio and matching logic
+                    window.currentStudentProfile = s;
+
+                    // Reset all fields to '-' before filling
+                    const statValues = document.querySelectorAll('.stat-value');
+                    statValues.forEach(el => el.textContent = '-');
+
+                    const setSafeText = (id, val) => {
+                        const el = document.getElementById(id);
+                        if (el) el.textContent = val || '-';
+                    };
+
+                    // Top Navbar Name
+                    const userEl = document.getElementById('userName');
+                    if (userEl) userEl.textContent = s.Stud_Name || 'Student';
+
+                    // Profile Cards - Only show if profile is actually complete, otherwise show '-'
+                    if (s.ProfileComplete) {
+                        setSafeText('pName', s.Stud_Name);
+                        setSafeText('pUSN', s.USN);
+                        setSafeText('pDept', s.Dept);
+                        setSafeText('pCGPA', s.CGPA);
+                        setSafeText('p10th', s.Marks_10th ? s.Marks_10th + '%' : '-');
+                        setSafeText('p12th', s.Marks_12th ? s.Marks_12th + '%' : '-');
+                        setSafeText('pDiploma', s.Diploma_Marks ? s.Diploma_Marks + '%' : '-');
+                        setSafeText('pBacklogs', s.Backlogs);
+                        setSafeText('pLinkedIn', s.LinkedIn);
+                        setSafeText('pGitHub', s.GitHub);
+
+                        const pResume = document.getElementById('pResume');
+                        if (pResume) {
+                            pResume.innerHTML = s.Resume_Link ? `<a href="${s.Resume_Link}" target="_blank" style="color: var(--accent)">View Resume ↗</a>` : '-';
+                        }
+
+                        setSafeText('pProjects', s.Projects);
+                        setSafeText('pAchievements', s.Achievements);
+
+                        const pCerts = document.getElementById('pCertificates');
+                        if (pCerts) {
+                            if (s.Certificates) {
+                                const links = s.Certificates.split(';').filter(x => x.trim());
+                                pCerts.innerHTML = links.map((href, idx) => `<a href="${href}" target="_blank" style="color:var(--accent); margin-right:0.5rem; display:inline-block;">Certificate ${idx + 1} ↗</a>`).join('');
+                            } else {
+                                pCerts.innerHTML = '';
+                            }
+                        }
+
+                        // also populate portfolio tab
+                        renderPortfolio(s);
+
+                        updateProfileCompleteness(s);
+                    } else {
+                        // Profile is incomplete, show name/usn/dept but leave stats empty for simulation
+                        setSafeText('pName', s.Stud_Name);
+                        setSafeText('pUSN', s.USN);
+                        setSafeText('pDept', s.Dept);
+                        showEditProfile();
+                    }
+
+                    fillEditForm(s);
+                    // initial portfolio render for incomplete profiles as well
+                    renderPortfolio(s);
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+        function renderPortfolio(s) {
+            if (!s) return;
+
+            // Top links
+            const portLinkedIn = document.getElementById('portLinkedIn');
+            const portGitHub = document.getElementById('portGitHub');
+            const portResume = document.getElementById('portResume');
+
+            if (portLinkedIn) {
+                portLinkedIn.textContent = s.LinkedIn && s.LinkedIn.trim() ? s.LinkedIn : '-';
+            }
+
+            if (portGitHub) {
+                portGitHub.textContent = s.GitHub && s.GitHub.trim() ? s.GitHub : '-';
+            }
+
+            if (portResume) {
+                portResume.textContent = s.Resume_Link && s.Resume_Link.trim()
+                    ? 'Resume Uploaded'
+                    : '-';
+            }
+
+            // Projects
+            const projContainer = document.getElementById('portfolioProjects');
+            if (projContainer) {
+                projContainer.textContent = s.Projects && s.Projects.trim()
+                    ? s.Projects
+                    : 'No projects added yet. Update them in the profile tab.';
+            }
+
+            // Achievements
+            const achContainer = document.getElementById('portfolioAchievements');
+            if (achContainer) {
+                achContainer.textContent = s.Achievements && s.Achievements.trim()
+                    ? s.Achievements
+                    : 'No achievements added yet. Update them in the profile tab.';
+            }
+
+            // Certificates
+            const certContainer = document.getElementById('portfolioCertificates');
+            if (certContainer) {
+                if (s.Certificates) {
+                    const links = s.Certificates.split(';')
+                        .map(x => x.trim())
+                        .filter(Boolean);
+                    certContainer.textContent = links.join(' | ');
+                } else {
+                    certContainer.textContent = '';
+                }
+            }
+        }
+        
+        function fillEditForm(s) {
+            document.getElementById('editUSN').value = s.USN || '';
+            document.getElementById('editCGPA').value = s.CGPA || '';
+            document.getElementById('editSem').value = s.Semester || '';
+            document.getElementById('edit10th').value = s.Marks_10th || '';
+            document.getElementById('edit12th').value = s.Marks_12th || '';
+            document.getElementById('editDiploma').value = s.Diploma_Marks || '';
+            document.getElementById('editBacklogs').value = s.Backlogs || 0;
+            document.getElementById('editHistoryBacklogs').value = s.History_of_Backlogs || 0;
+            document.getElementById('editPhone').value = s.Phone || '';
+            document.getElementById('editAddress').value = s.Address || '';
+            document.getElementById('editSkills').value = s.Skills || '';
+            document.getElementById('editLinkedIn').value = s.LinkedIn || '';
+            document.getElementById('editGitHub').value = s.GitHub || '';
+            document.getElementById('editProjects').value = s.Projects || '';
+            document.getElementById('editAchievements').value = s.Achievements || '';
+        }
+
+        function updateProfileCompleteness(s) {
+            let total = 0;
+            let filled = 0;
+
+            const check = (val) => {
+                total++;
+                if (val !== null && val !== undefined && String(val).trim() !== '') filled++;
+            };
+
+            check(s.CGPA);
+            check(s.Semester);
+            check(s.Marks_10th);
+            check(s.Marks_12th || s.Diploma_Marks);
+            check(s.Skills);
+            check(s.Resume_Link);
+            check(s.Projects);
+            check(s.Achievements);
+            check(s.LinkedIn);
+            check(s.GitHub);
+
+            const percent = total ? Math.round((filled / total) * 100) : 0;
+
+            const bar = document.getElementById('profileProgressBar');
+            const label = document.getElementById('profileProgressLabel');
+            if (bar) bar.style.width = `${percent}%`;
+            if (label) label.textContent = `${percent}% complete`;
+        }
+
+        function showEditProfile() {
+            document.getElementById('profileView').style.display = 'none';
+            document.getElementById('editProfileView').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'none';
+        }
+
+        function cancelEdit() {
+            document.getElementById('editProfileView').style.display = 'none';
+            document.getElementById('profileView').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'block';
+        }
+
+        async function saveProfile(e) {
+            e.preventDefault();
+            try {
+                const result = await apiCall('/student/profile', 'PUT', {
+                    CGPA: parseFloat(document.getElementById('editCGPA').value),
+                    Semester: parseInt(document.getElementById('editSem').value),
+                    Marks_10th: parseFloat(document.getElementById('edit10th').value),
+                    Marks_12th: document.getElementById('edit12th').value ? parseFloat(document.getElementById('edit12th').value) : null,
+                    Diploma_Marks: document.getElementById('editDiploma').value ? parseFloat(document.getElementById('editDiploma').value) : null,
+                    Backlogs: parseInt(document.getElementById('editBacklogs').value),
+                    History_of_Backlogs: parseInt(document.getElementById('editHistoryBacklogs').value),
+                    Phone: document.getElementById('editPhone').value,
+                    Address: document.getElementById('editAddress').value,
+                    Skills: document.getElementById('editSkills').value,
+                    Projects: document.getElementById('editProjects').value,
+                    Achievements: document.getElementById('editAchievements').value,
+                    LinkedIn: document.getElementById('editLinkedIn').value,
+                    GitHub: document.getElementById('editGitHub').value
+                });
+
+                if (result.success) {
+                    showAlert('Professional profile updated!', 'success');
+                    loadStudentDashboard();
+                    cancelEdit();
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function uploadResume() {
+            const fileInput = document.getElementById('editResumeFile');
+
+            if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+                showAlert('Please choose a PDF file to upload.', 'error');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            if (file.type !== 'application/pdf') {
+                showAlert('Only PDF resumes are allowed.', 'error');
+                return;
+            }
+
+            try {
+                const token = getToken();
+                const formData = new FormData();
+                formData.append('resume', file);
+
+                const response = await fetch('http://localhost:5001/api/student/profile/resume', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': token ? `Bearer ${token}` : ''
+                    },
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (!response.ok || !result.success) {
+                    throw new Error(result.message || 'Failed to upload resume');
+                }
+
+                showAlert('Resume uploaded successfully!', 'success');
+                loadStudentDashboard();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function renderCompaniesList(companies) {
+            const profile = window.currentStudentProfile || {};
+
+            const computeMatchScore = (company) => {
+                let score = 0;
+                let weightTotal = 0;
+
+                // CGPA vs Required_CGPA
+                if (company.Required_CGPA && profile.CGPA) {
+                    weightTotal += 40;
+                    if (profile.CGPA >= company.Required_CGPA) {
+                        score += 40;
+                    } else {
+                        const ratio = profile.CGPA / company.Required_CGPA;
+                        score += Math.max(0, Math.min(40, Math.round(40 * ratio)));
+                    }
+                }
+
+                // Skills overlap
+                if (company.Required_Skills && profile.Skills) {
+                    weightTotal += 40;
+                    const toTokens = (s) => s.toLowerCase().split(/[,\n]/).map(t => t.trim()).filter(Boolean);
+                    const compSkills = new Set(toTokens(company.Required_Skills));
+                    const stuSkills = new Set(toTokens(profile.Skills));
+                    let overlap = 0;
+                    stuSkills.forEach(sk => { if (compSkills.has(sk)) overlap++; });
+                    const max = Math.max(compSkills.size, 1);
+                    const frac = Math.min(1, overlap / max);
+                    score += Math.round(40 * frac);
+                }
+
+                // Backlog penalty
+                weightTotal += 20;
+                if ((profile.Backlogs || 0) === 0) {
+                    score += 20;
+                } else if ((profile.Backlogs || 0) <= 2) {
+                    score += 10;
+                }
+
+                if (!weightTotal) return 0;
+                return Math.min(100, Math.round((score / weightTotal) * 100));
+            };
+
+            const html = companies.map(c => {
+                const matchScore = computeMatchScore(c);
+                const recommended = matchScore >= 70;
+
+                return `
+            <div class="card company-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                  <h3 style="margin-bottom: 0.25rem;">${c.Comp_Name}</h3>
+                  <p class="text-muted" style="margin-bottom: 1rem;">${c.Industry || 'Tech Industry'}</p>
+                </div>
+                <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0.35rem;">
+                  <span class="badge" style="background: #e0f2fe; color: #0369a1; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">${c.Job_Type || 'Full-time'}</span>
+                  <span class="badge" style="background:#ecfdf5; color:#16a34a; padding:0.2rem 0.6rem; border-radius:999px; font-size:0.7rem; font-weight:600;">Fit Score: ${matchScore}%${recommended ? ' • Recommended' : ''}</span>
+                </div>
+              </div>
+              
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                  <small class="text-muted">Designation</small>
+                  <div style="font-weight: 600;">${c.Role}</div>
+                </div>
+                <div>
+                  <small class="text-muted">Base Package</small>
+                  <div style="font-weight: 600; color: var(--success);">₹${c.Package} LPA</div>
+                </div>
+                <div>
+                  <small class="text-muted">Location</small>
+                  <div style="font-weight: 600;">${c.Job_Location || '-'}</div>
+                </div>
+                <div>
+                  <small class="text-muted">Min. CGPA</small>
+                  <div style="font-weight: 600;">${c.Required_CGPA}</div>
+                </div>
+              </div>
+
+              <div style="margin-bottom: 1.5rem;">
+                <small class="text-muted">Required Skills</small>
+                <div style="font-size: 0.875rem; margin-top: 0.25rem;">${c.Required_Skills || 'General Tech'}</div>
+              </div>
+              <button class="btn-premium" style="width: 100%;" onclick="applyJob(${c.Comp_ID})">Submit Application</button>
+            </div>
+          `}).join('');
+
+            document.getElementById('companiesList').innerHTML = html || '<div class="card" style="grid-column: 1/-1; text-align: center; padding: 3rem;">No active recruitment drives found.</div>';
+        }
+
+        async function loadCompanies() {
+            try {
+                const result = await apiCall('/student/companies');
+                if (result.success) {
+                    await renderCompaniesList(result.data);
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadEligibleCompanies() {
+            try {
+                const result = await apiCall('/student/eligible-companies');
+                if (result.success) {
+                    await renderCompaniesList(result.data);
+                    if (result.data.length === 0) {
+                        showAlert('No companies currently match your eligibility (CGPA, dept, backlogs).', 'error');
+                    } else {
+                        showAlert('Showing companies you are currently eligible for.', 'success');
+                    }
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function applyJob(compId) {
+            try {
+                const result = await apiCall('/student/apply', 'POST', { companyId: compId });
+                showAlert('Application submitted!', 'success');
+                loadApplications();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadApplications() {
+            try {
+                const result = await apiCall('/student/applications');
+                if (result.success) {
+                    const rows = result.data.map(a => `
+            <tr>
+              <td>${a.Comp_Name}</td>
+              <td>${a.Role}</td>
+              <td>₹${a.Package}</td>
+              <td>${a.Job_Location}</td>
+              <td><span class="badge badge-${getStatusColor(a.Status)}">${a.Status}</span></td>
+              <td>${new Date(a.Applied_At).toLocaleDateString()}</td>
+            </tr>
+          `).join('');
+                    document.getElementById('applicationsTbody').innerHTML = rows || '<tr><td colspan="6">No applications</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadInterviews() {
+            try {
+                const result = await apiCall('/student/interviews');
+                if (result.success) {
+                    const rows = result.data.map(i => {
+                        const date = new Date(i.Int_Date).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+                        const statusClass = i.Result === 'Pass' ? 'success' : i.Result === 'Fail' ? 'danger' : 'warning';
+                        return `
+            <tr>
+              <td style="font-weight: 600;">${i.Comp_Name}</td>
+              <td>
+                <div>${date}</div>
+                <small class="text-muted">${i.Int_Time}</small>
+              </td>
+              <td>Round ${i.Round_No}</td>
+              <td><span class="badge" style="background: #f1f5f9; padding: 0.25rem 0.5rem; border-radius: 4px;">${i.Int_Mode}</span></td>
+              <td>${i.Int_Type}</td>
+              <td>
+                ${i.Int_Mode === 'Online' ?
+                                `<a href="${i.Meeting_Link}" target="_blank" class="btn-premium btn-sm" style="text-decoration: none;">Join Meeting</a>` :
+                                `<div style="font-size: 0.8rem;">${i.Venue || 'TBA'}</div>`}
+              </td>
+              <td><span class="badge badge-${statusClass}">${i.Result || 'Upcoming'}</span></td>
+            </tr>
+          `}).join('');
+                    document.getElementById('interviewsTbody').innerHTML = rows || '<tr><td colspan="7" class="text-center" style="padding: 3rem;">No interviews scheduled yet.</td></tr>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        async function loadOffers() {
+            try {
+                const result = await apiCall('/student/offers');
+                if (result.success) {
+                    const html = result.data.map(o => `
+            <div class="card offer-card">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h3 style="margin: 0;">${o.Comp_Name}</h3>
+                <span class="badge badge-${o.Acceptance_Status === 'Accepted' ? 'success' : o.Acceptance_Status === 'Rejected' ? 'danger' : 'warning'}">
+                  ${o.Acceptance_Status}
+                </span>
+              </div>
+              
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                <div>
+                  <small class="text-muted">Designation</small>
+                  <div style="font-weight: 600;">${o.Role}</div>
+                </div>
+                <div>
+                  <small class="text-muted">Offered CTC</small>
+                  <div style="font-weight: 600; color: var(--success);">₹${o.Salary} LPA</div>
+                </div>
+                <div>
+                  <small class="text-muted">Joining Date</small>
+                  <div style="font-weight: 600;">${new Date(o.Join_Date).toLocaleDateString('en-IN')}</div>
+                </div>
+                <div>
+                  <small class="text-muted">Service Bond</small>
+                  <div style="font-weight: 600;">${o.Bond_Duration} Months</div>
+                </div>
+              </div>
+
+              ${o.Acceptance_Status === 'Pending' ? `
+                <div style="display: flex; gap: 1rem;">
+                  <button class="btn-premium" style="flex: 1;" onclick="respondToOffer(${o.Offer_ID}, 'Accepted')">Accept Offer</button>
+                  <button class="btn-premium" style="flex: 1; background: #ef4444;" onclick="respondToOffer(${o.Offer_ID}, 'Rejected')">Decline</button>
+                </div>
+              ` : `
+                <div style="background: #f8fafc; padding: 0.75rem; border-radius: 0.5rem; text-align: center; font-weight: 600;">
+                  Offer ${o.Acceptance_Status}
+                </div>
+              `}
+            </div>
+          `).join('');
+                    document.getElementById('offersList').innerHTML = html || '<div class="card" style="grid-column: 1/-1; text-align: center; padding: 3rem;">No placement offers received yet.</div>';
+                }
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+
+        function getStatusColor(status) {
+            return status === 'Applied' ? 'warning' : status === 'Shortlisted' ? 'info' : status === 'Selected' ? 'success' : 'danger';
+        }
+
+        async function respondToOffer(offerId, status) {
+            try {
+                await apiCall(`/student/offer/${offerId}/respond`, 'PUT', { status });
+                showAlert(`Offer ${status}!`, 'success');
+                loadOffers();
+            } catch (error) {
+                showAlert(error.message, 'error');
+            }
+        }
+    </script>
+</body>
+
+</html>
